@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/form.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { parseErrors } from "../../utilities/parseErrors";
 import Alert from "../../alert/Alert";
@@ -9,8 +9,14 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [alert, setAlert] = useState({});
+
   const navigate = useNavigate();
-  const handleRegister = async (e) => {
+  const location = useLocation;
+
+  const searchParams = new URLSearchParams(location.search);
+  const code = searchParams.get("code");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== passwordConfirmation) {
@@ -23,6 +29,7 @@ export default function ResetPassword() {
     const data = {
       password,
       passwordConfirmation,
+      code,
     };
 
     try {
@@ -43,7 +50,7 @@ export default function ResetPassword() {
     <>
       <Alert data={alert} />
       <div className="form form--page">
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleSubmit}>
           <div className="form__group form__group--page">
             <label className="form__label">Choose password</label>
             <input
