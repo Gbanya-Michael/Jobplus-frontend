@@ -11,18 +11,30 @@ import RegisterPage from "./pages/RegisterPage";
 import SavedJobPage from "./pages/SavedJobPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPassword from "./components/reset_password/ResetPassword";
+import PrivateRoute from "./private_route/private_route";
+
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/applications" element={<ApplicationPage />} />
-      <Route path="/apply" element={<ApplyPage />} />
-      <Route path="/listings" element={<ListingsPage />} />
-      <Route path="/notifications" element={<NotificationPage />} />
+      <Route
+        path="/*"
+        element={
+          <PrivateRoute>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/applications" element={<ApplicationPage />} />
+              <Route path="/apply" element={<ApplyPage />} />
+              <Route path="/saved-jobs" element={<SavedJobPage />} />
+              <Route path="/listings" element={<ListingsPage />} />
+              <Route path="/notifications" element={<NotificationPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
+          </PrivateRoute>
+        }
+      />
+
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/saved-jobs" element={<SavedJobPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
