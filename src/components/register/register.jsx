@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "../styles/form.scss";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { parseErrors } from "../../utilities/parseErrors";
+import { Link } from "react-router-dom";
 import Alert from "../../alert/Alert";
+import { useApi } from "../../hooks/useApi";
 
 export default function Register() {
   const [firstName, setFirstName] = useState("");
@@ -12,7 +11,22 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [alert, setAlert] = useState({});
-  const navigate = useNavigate();
+
+  const { post } = useApi();
+
+  const handleSuccess = () => {
+    setAlert({
+      message: "You have successfully created an account.",
+      details: [],
+      type: "success",
+    });
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -31,21 +45,11 @@ export default function Register() {
       username: email,
     };
 
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/local/register`,
-        data
-      );
-      navigate("/login");
-      setAlert({});
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-    } catch (error) {
-      setAlert(parseErrors(error));
-    }
+    await post("auth/local/register", {
+      data: data,
+      onSuccess: (res) => handleSuccess(),
+      onFailure: (error) => setAlert(error),
+    });
   };
 
   return (
@@ -59,7 +63,7 @@ export default function Register() {
               className="form__field"
               type="text"
               placeholder="First name"
-              // required
+              required
               autoComplete="true"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -72,7 +76,7 @@ export default function Register() {
               className="form__field"
               type="text"
               placeholder="Last name"
-              // required
+              required
               autoComplete="true"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -85,7 +89,7 @@ export default function Register() {
               className="form__field"
               type="text"
               placeholder="Email"
-              // required
+              required
               autoComplete="true"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -98,7 +102,7 @@ export default function Register() {
               className="form__field"
               type="password"
               placeholder="Choose password"
-              // required
+              required
               autoComplete="false"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -110,7 +114,7 @@ export default function Register() {
             <input
               className="form__field"
               type="password"
-              // required
+              required
               autoComplete="false"
               placeholder="Confirm Password"
               value={confirmPassword}

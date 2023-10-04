@@ -1,36 +1,32 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/form.scss";
-import axios from "axios";
 import Alert from "../../alert/Alert";
-import { parseErrors } from "../../utilities/parseErrors";
+import { useApi } from "../../hooks/useApi";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [alert, setAlert] = useState("");
 
+  const { post } = useApi();
+
+  const handleSuccess = () => {
+    setAlert({
+      message: "Check your email for password reset link.",
+      detail: [],
+      type: "success",
+    });
+    setEmail("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      email,
-    };
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
-        data
-      );
-
-      setAlert({
-        message: "Check your email for password reset link.",
-        type: "success",
-      });
-
-      setEmail("");
-    } catch (error) {
-      setAlert(parseErrors(error));
-    }
+    await post("auth/forgot-password", {
+      data: { email },
+      onSuccess: (res) => handleSuccess(),
+      onFailure: (error) => setAlert(error),
+    });
   };
   return (
     <>

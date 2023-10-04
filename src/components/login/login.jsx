@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/form.scss";
-import axios from "axios";
 import Alert from "../../alert/Alert";
-import { parseErrors } from "../../utilities/parseErrors";
+import { useApi } from "../../hooks/useApi";
 
 export default function login() {
   const [identifier, setIdentifier] = useState("");
@@ -12,25 +11,22 @@ export default function login() {
 
   const navigate = useNavigate();
 
+  const { post } = useApi();
+
+  const handleSuccess = () => {
+    setIdentifier("");
+    setPassword("");
+    navigate("/");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      identifier,
-      password,
-    };
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/local`,
-        data
-      );
-      navigate("/");
-      setIdentifier("");
-      setPassword("");
-    } catch (error) {
-      setAlert(parseErrors(error));
-    }
+    await post("auth/local", {
+      data: { identifier, password },
+      onSuccess: (res) => handleSuccess(),
+      onFailure: (error) => setAlert(error),
+    });
   };
   return (
     <>

@@ -1,21 +1,31 @@
 import React, { useState } from "react";
 import "../styles/form.scss";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
-import { parseErrors } from "../../utilities/parseErrors";
 import Alert from "../../alert/Alert";
+import { useApi } from "../../hooks/useApi";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [alert, setAlert] = useState({});
+  const navigate = useNavigate("");
 
-  const navigate = useNavigate();
   const location = useLocation;
 
   const searchParams = new URLSearchParams(location.search);
   const code = searchParams.get("code");
+  const { post } = useApi();
 
+  const handdleSuccess = (res) => {
+    setAlert({
+      message: "You have successfully changed your password.",
+      details: [],
+      type: "succcess",
+    });
+    setPassword("");
+    setPasswordConfirmation("");
+    navigate("/login");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -26,24 +36,12 @@ export default function ResetPassword() {
       });
       return;
     }
-    const data = {
-      password,
-      passwordConfirmation,
-      code,
-    };
 
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/reset-password`,
-        data
-      );
-      navigate("/login");
-      setAlert({});
-      setPassword("");
-      setPasswordConfirmation("");
-    } catch (error) {
-      setAlert(parseErrors(error));
-    }
+    await post("auth/reset-password", {
+      data: { password, passwordConfirmation, code },
+      onSuccess: (res) => handdleSuccess(),
+      onFailure: (error) => setAlert(error),
+    });
   };
 
   return (
