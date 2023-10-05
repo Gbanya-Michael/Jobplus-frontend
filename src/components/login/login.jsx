@@ -3,19 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/form.scss";
 import Alert from "../../alert/Alert";
 import { useApi } from "../../hooks/useApi";
+import { useAuth } from "../../context/AuthContext";
+import { useCookie } from "../../hooks/useCookie";
 
 export default function login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [alert, setAlert] = useState("");
+  const { setIsAuthenticated } = useAuth();
 
   const navigate = useNavigate();
 
   const { post } = useApi();
+  const { saveAuthCookie } = useCookie();
 
-  const handleSuccess = () => {
+  const handleSuccess = (res) => {
+    saveAuthCookie(res.data.jwt);
     setIdentifier("");
     setPassword("");
+    setIsAuthenticated(true);
     navigate("/");
   };
 
@@ -24,7 +30,7 @@ export default function login() {
 
     await post("auth/local", {
       data: { identifier, password },
-      onSuccess: (res) => handleSuccess(),
+      onSuccess: (res) => handleSuccess(res),
       onFailure: (error) => setAlert(error),
     });
   };
