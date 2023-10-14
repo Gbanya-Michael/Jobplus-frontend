@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./sector.scss";
 import { useApi } from "../../hooks/useApi";
-import { TechBig, TechSmall } from "../images";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -71,8 +70,8 @@ export default function sector() {
                   return (
                     <li key={category.id}>
                       <Link to="">
-                        {title}
-                        <span>{jobArray.length}</span>
+                        {" "}
+                        {title} <span>{jobArray.length}</span>
                       </Link>
                     </li>
                   );
