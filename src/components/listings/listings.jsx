@@ -1,22 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./listings.scss";
+import { useApi } from "../../hooks/useApi";
 
 import Paginate from "../paginate/paginate";
 
 import { StarSaved, Money, Location, Timer } from "../images";
+const MAX_PER_PAGE = 2;
 
 export default function listings() {
+  const [jobs, setJobs] = useState([]);
+  const [meta, setMeta] = useState({});
+  const { get } = useApi();
+
+  const handleSuccess = (res) => {
+    const { entries, meta } = res.data;
+    setJobs(entries);
+    setMeta(meta);
+  };
+
+  const fetchJobs = async (page = 1) => {
+    get("jobs", {
+      onSuccess: (res) => handleSuccess(res),
+      params: {
+        "populate[company]": true,
+        start: (page - 1) * MAX_PER_PAGE, // Corrected calculation here
+        limit: MAX_PER_PAGE,
+      },
+    });
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+  const handlePageChange = (pageNumber) => {
+    fetchJobs(pageNumber);
+  };
+  console.log(jobs);
+
   return (
     <section>
-      <a href="apply.html">
-        <div className="listing__card">
+      {jobs.map((job) => (
+        <div key={job.id} className="listing__card">
           <header className="listing__header">
-            <h1 className="listing__title">
-              Regulatory Affairs Senior Manager
-            </h1>
+            <h1 className="listing__title">{job.title}</h1>
             <img className="listing__saved" src={StarSaved} alt="" />
             <p className="listing__company">
-              Posted by <span>Koco Media</span>
+              Posted by <span>{job.company.name}</span>
             </p>
           </header>
 
@@ -36,14 +65,14 @@ export default function listings() {
           </ul>
 
           <p className="listing__detail">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Explicabo,
-            asperiores ullam minus at <b>Read more...</b>
+            {job.description} <b>Read more...</b>
           </p>
 
           <div className="listing__cta">Withdraw application</div>
         </div>
-      </a>
-      <Paginate />
+      ))}
+
+      <Paginate meta={meta.paginate} onPageChange={handlePageChange} />
     </section>
   );
 }
