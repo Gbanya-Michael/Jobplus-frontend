@@ -5,7 +5,7 @@ import { useApi } from "../../hooks/useApi";
 import Paginate from "../paginate/paginate";
 
 import { StarSaved, Money, Location, Timer } from "../images";
-const MAX_PER_PAGE = 2;
+const MAX_PER_PAGE = 3;
 
 export default function listings() {
   const [jobs, setJobs] = useState([]);
