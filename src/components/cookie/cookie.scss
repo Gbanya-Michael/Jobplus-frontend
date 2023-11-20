@@ -1,13 +1,14 @@
 .cookie {
-  display: grid;
-  grid-template-columns: 1fr min-content;
-
   background-color: var(--beta);
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
   color: var(--delta);
   padding: 12rem;
   position: fixed;
   width: 100%;
   bottom: 40rem;
+  padding-right: 10rem;
 
   a {
     text-decoration: underline;
