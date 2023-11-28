@@ -1,10 +1,10 @@
 import React, { Fragment, useEffect, useState } from "react";
 import "./listings.scss";
-import { useApi } from "../../hooks/useApi";
 import Paginate from "../paginate/paginate";
 import { StarUnSaved, StarSaved, Money, Location, Timer } from "../images";
 import Confirmationmodal from "../confirmation_modal/Confirmation_modal";
-const MAX_PER_PAGE = 3;
+import jobService from "../../services/JobService";
+
 const MAX_CHAR_LENGTH = 200;
 
 export default function listings() {
@@ -12,7 +12,8 @@ export default function listings() {
   const [meta, setMeta] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [jobToSave, setJobToSave] = useState(null);
-  const { get } = useApi();
+
+  const { fetchJobs } = jobService();
 
   const handleSuccess = (res) => {
     const { entries, meta } = res.data;
@@ -26,17 +27,16 @@ export default function listings() {
     setMeta(meta);
   };
 
-  const fetchJobs = async (page = 1) => {
-    get("jobs", {
-      onSuccess: (res) => handleSuccess(res),
-      params: {
-        "populate[company]": true,
-        "populate[job_types]": true,
-        start: (page - 1) * MAX_PER_PAGE,
-        limit: MAX_PER_PAGE,
-      },
-    });
-  };
+  //   get("jobs", {
+  //     onSuccess: (res) => handleSuccess(res),
+  //     params: {
+  //       "populate[company]": true,
+  //       "populate[job_types]": true,
+  //       start: (page - 1) * MAX_PER_PAGE,
+  //       limit: MAX_PER_PAGE,
+  //     },
+  //   });
+  // };
   const truncate = (text, jobId) => {
     const job = jobs.find((job) => job.id === jobId);
     const shouldTruncate = text.length > MAX_CHAR_LENGTH && job?.isTruncated;
@@ -67,10 +67,11 @@ export default function listings() {
   };
 
   useEffect(() => {
-    fetchJobs();
+    const page = 1;
+    fetchJobs(page, handleSuccess);
   }, []);
   const handlePageChange = (pageNumber) => {
-    fetchJobs(pageNumber);
+    fetchJobs(pageNumber, handleSuccess);
   };
 
   return (
