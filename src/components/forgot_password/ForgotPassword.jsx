@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/form.scss";
 import Alert from "../../alert/Alert";
-import { useApi } from "../../hooks/useApi";
+import authService from "../../services/AuthService";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [alert, setAlert] = useState("");
 
-  const { post } = useApi();
+  const { forgotPassword } = authService();
 
   const handleSuccess = () => {
     setAlert({
@@ -19,15 +19,15 @@ export default function ForgotPassword() {
     setEmail("");
   };
 
+  const handleError = (error) => {
+    setAlert(error);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await post("auth/forgot-password", {
-      data: { email },
-      onSuccess: (res) => handleSuccess(),
-      onFailure: (error) => setAlert(error),
-    });
+    await forgotPassword(email, handleSuccess, handleError);
   };
+
   return (
     <>
       <Alert data={alert} />

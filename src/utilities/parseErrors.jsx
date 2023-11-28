@@ -19,15 +19,6 @@ export const parseErrors = (error) => {
     };
   }
 
-  // if (
-  //   error?.response?.data?.error?.details?.error?.message ===
-  //   "identifier is a required field"
-  // ) {
-  //   return {
-  //     message: "Email is required",
-  //     details: [],
-  //   };
-  // }
   return {
     message: "An error has occured",
     details: [],

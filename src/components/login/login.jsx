@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/form.scss";
 import Alert from "../../alert/Alert";
-import { useApi } from "../../hooks/useApi";
 import { useAuth } from "../../context/AuthContext";
 import { useCookie } from "../../hooks/useCookie";
+import authService from "../../services/AuthService";
 
 export default function login() {
   const [identifier, setIdentifier] = useState("");
@@ -13,8 +13,8 @@ export default function login() {
   const { setIsAuthenticated } = useAuth();
 
   const navigate = useNavigate();
+  const { loginUser } = authService();
 
-  const { post } = useApi();
   const { saveAuthCookie } = useCookie();
 
   const handleSuccess = (res) => {
@@ -24,15 +24,13 @@ export default function login() {
     setIsAuthenticated(true);
     navigate("/");
   };
-
+  const handleError = (error) => {
+    setAlert(error);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await post("auth/local", {
-      data: { identifier, password },
-      onSuccess: (res) => handleSuccess(res),
-      onFailure: (error) => setAlert(error),
-    });
+    await loginUser({ identifier, password }, handleSuccess, handleError);
   };
   return (
     <>

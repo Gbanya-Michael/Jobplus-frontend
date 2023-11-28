@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/form.scss";
 import { useNavigate, useLocation } from "react-router-dom";
 import Alert from "../../alert/Alert";
-import { useApi } from "../../hooks/useApi";
+import authService from "../../services/AuthService";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -14,7 +14,7 @@ export default function ResetPassword() {
 
   const searchParams = new URLSearchParams(location.search);
   const code = searchParams.get("code");
-  const { post } = useApi();
+  const { resetPassword } = authService();
 
   const handdleSuccess = (res) => {
     setAlert({
@@ -25,6 +25,10 @@ export default function ResetPassword() {
     setPassword("");
     setPasswordConfirmation("");
     navigate("/login");
+  };
+
+  const handleError = (error) => {
+    setAlert(error);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,11 +41,11 @@ export default function ResetPassword() {
       return;
     }
 
-    await post("auth/reset-password", {
-      data: { password, passwordConfirmation, code },
-      onSuccess: (res) => handdleSuccess(),
-      onFailure: (error) => setAlert(error),
-    });
+    await resetPassword(
+      { password, passwordConfirmation, code },
+      handdleSuccess,
+      handleError
+    );
   };
 
   return (
@@ -55,7 +59,6 @@ export default function ResetPassword() {
               className="form__field"
               type="password"
               placeholder="Choose password"
-              // required
               autoComplete="false"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -67,7 +70,6 @@ export default function ResetPassword() {
             <input
               className="form__field"
               type="password"
-              // required
               autoComplete="false"
               placeholder="Confirm Password"
               value={passwordConfirmation}

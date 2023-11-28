@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/form.scss";
 import { Link } from "react-router-dom";
 import Alert from "../../alert/Alert";
-import { useApi } from "../../hooks/useApi";
+import authService from "../../services/AuthService";
 
 export default function Register() {
   const [firstName, setFirstName] = useState("");
@@ -12,7 +12,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [alert, setAlert] = useState({});
 
-  const { post } = useApi();
+  const { registerUser } = authService();
 
   const handleSuccess = () => {
     setAlert({
@@ -45,11 +45,10 @@ export default function Register() {
       username: email,
     };
 
-    await post("auth/local/register", {
-      data: data,
-      onSuccess: (res) => handleSuccess(),
-      onFailure: (error) => setAlert(error),
-    });
+    const handleError = (error) => {
+      setAlert(error);
+    };
+    await registerUser(data, handleSuccess, handleError);
   };
 
   return (
